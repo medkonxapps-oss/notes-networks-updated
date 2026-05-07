@@ -1,0 +1,42 @@
+name: notes_network
+repository: https://github.com/yourorg/notes_network
+
+packages:
+  - packages/**
+
+scripts:
+  bootstrap:
+    run: melos bootstrap
+    description: Install all dependencies across all packages
+
+  generate:
+    run: melos exec --depends-on='build_runner' -- dart run build_runner build --delete-conflicting-outputs
+    description: Run code generation (freezed, json_serializable) in all packages
+
+  analyze:
+    run: melos exec -- flutter analyze
+    description: Run flutter analyze on all packages
+
+  test:
+    run: melos exec --depends-on='flutter_test' -- flutter test
+    description: Run tests in all packages
+
+  run:app:
+    run: cd packages/app && flutter run
+    description: Run mobile app
+
+  run:admin:
+    run: cd packages/admin && flutter run -d chrome
+    description: Run admin panel in Chrome
+
+  build:android:
+    run: cd packages/app && flutter build apk --release
+    description: Build Android release APK
+
+  build:ios:
+    run: cd packages/app && flutter build ios --release
+    description: Build iOS release
+
+  build:web:admin:
+    run: cd packages/admin && flutter build web --release
+    description: Build admin panel web release

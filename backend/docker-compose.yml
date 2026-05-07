@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    restart: always
+    ports:
+      - '3000:3000'
+    environment:
+      - NODE_ENV=production
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - REDIS_URL=redis://redis:6379
+      - FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID}
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY}
+      - WEBHOOK_SECRET=${WEBHOOK_SECRET}
+      - VPS_PORT=3000
+    depends_on:
+      - redis
+    volumes:
+      - /tmp:/tmp
+
+  redis:
+    image: redis:7-alpine
+    restart: always
+    command: redis-server --bind 127.0.0.1 --save 60 1000
+    volumes:
+      - redis_data:/data
+
+volumes:
+  redis_data:

@@ -1,0 +1,84 @@
+name: app
+description: NotesNet mobile app
+
+publish_to: none
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Local packages
+  shared:
+    path: ../shared
+  design_system:
+    path: ../design_system
+
+  # Navigation & State
+  flutter_riverpod: ^2.5.1
+  riverpod_annotation: ^2.3.5
+  go_router: ^17.2.2
+
+  # Supabase
+  supabase_flutter: ^2.5.0
+
+  # Images & Files
+  cached_network_image: ^3.3.1
+  flutter_cache_manager: ^3.4.1
+  image_picker: ^1.1.2
+  image_cropper: ^12.2.1
+  file_picker: ^8.1.3
+
+  # PDF & Viewer
+  syncfusion_flutter_pdfviewer: ^33.2.3
+  photo_view: ^0.15.0
+
+  # Notifications
+  flutter_local_notifications: ^21.0.0
+  firebase_messaging: ^16.2.0
+  firebase_core: ^4.7.0
+
+  # Storage & DB
+  sqflite: ^2.3.3+1
+  path_provider: ^2.1.3
+  flutter_secure_storage: ^10.0.0
+
+  # Sharing & Launch
+  share_plus: ^12.0.2
+  url_launcher: ^6.3.0
+  printing: ^5.14.3
+  pdf: ^3.10.8
+
+  # UI & Animation
+  shimmer: ^3.0.0
+  lottie: ^3.1.2
+
+  # Utilities
+  uuid: ^4.4.0
+  intl: ^0.20.2
+  path: ^1.9.0
+  http: ^1.2.2
+  flutter_dotenv: ^6.0.1
+  connectivity_plus: ^7.1.1
+  permission_handler: ^12.0.1
+
+  cupertino_icons: ^1.0.8
+  shared_preferences: ^2.5.5
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  build_runner: ^2.4.12
+  riverpod_generator: ^2.4.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/lottie/
+    - .env

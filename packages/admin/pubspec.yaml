@@ -1,0 +1,35 @@
+name: admin
+description: NotesNet admin panel (Flutter Web)
+
+publish_to: none
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  shared:
+    path: ../shared
+  design_system:
+    path: ../design_system
+  flutter_riverpod: ^2.5.1
+  go_router: ^14.2.0
+  supabase_flutter: ^2.5.0
+  url_launcher: ^6.3.0
+  fl_chart: ^0.69.0
+  intl: ^0.19.0
+  flutter_dotenv: ^5.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - .env
+
