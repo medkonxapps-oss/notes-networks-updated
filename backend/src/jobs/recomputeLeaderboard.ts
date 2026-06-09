@@ -30,11 +30,13 @@ export async function recomputeLeaderboard() {
     pipeline.expire('leaderboard:alltime', 3600); // 1h TTL
     await pipeline.exec();
 
-    // Refresh feed scores in DB
-    await supabase.rpc('refresh_feed_scores');
+    // Refresh feed scores and sync all counts in DB
+    // admin_resync_all_counts handles everything including feed scores with the correct multi-param function
+    await supabase.rpc('admin_resync_all_counts');
 
     console.log(`✅ Leaderboard recomputed: ${users.length} users`);
   } catch (error) {
     console.error('❌ Leaderboard recomputation failed:', error);
   }
 }
+

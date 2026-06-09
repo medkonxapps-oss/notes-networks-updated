@@ -6,6 +6,7 @@ import rateLimit from 'express-rate-limit';
 import cron from 'node-cron';
 import webhookRouter from './routes/webhook';
 import healthRouter from './routes/health';
+import authRouter from './routes/auth';
 import { processUploadWorker } from './jobs/processUpload';
 import { pushNotificationWorker } from './jobs/sendPushNotification';
 import { recomputeLeaderboard } from './jobs/recomputeLeaderboard';
@@ -71,6 +72,7 @@ app.use((req, _res, next) => {
 
 // ── Routes ────────────────────────────────────────────────────────────────────
 app.use('/webhook', webhookRouter);
+app.use('/auth', authRouter);
 app.use('/', healthRouter);
 
 // ── Cron Jobs ──────────────────────────────────────────────────────────────────

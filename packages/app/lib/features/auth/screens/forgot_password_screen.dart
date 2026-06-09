@@ -28,7 +28,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     if (!_formKey.currentState!.validate()) return;
     setState(() { _loading = true; _error = null; });
     try {
-      await ref.read(authServiceProvider).resetPassword(_emailCtrl.text.trim());
+      await ref.read(authServiceProvider).resetPassword(
+        _emailCtrl.text.trim(),
+      );
       if (mounted) {
         setState(() { _emailSent = true; _loading = false; });
       }
@@ -37,13 +39,6 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     } catch (e) {
       setState(() { _error = 'An error occurred. Try again.'; _loading = false; });
     }
-  }
-
-  void _goToReset() {
-    if (_emailCtrl.text.trim().isEmpty) return;
-    context.push(
-      '/auth/reset-password?email=${Uri.encodeComponent(_emailCtrl.text.trim())}',
-    );
   }
 
   @override
@@ -81,8 +76,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                   const SizedBox(height: 8),
                   Text(
                     _emailSent
-                        ? 'A recovery code has been sent to your email. Check your inbox and tap "Enter Code" below.'
-                        : 'Enter your email to receive a recovery code.',
+                        ? 'A password reset link has been sent to your email. Click the link to reset your password.'
+                        : 'Enter your email to receive a password reset link.',
                     style: TextStyle(color: Colors.white.withValues(alpha: 0.75), fontSize: 14),
                     textAlign: TextAlign.center,
                   ),
@@ -118,9 +113,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                           ],
 
                           if (!_emailSent) ...[
-                            PrimaryButton(label: 'Send Code', onPressed: _requestReset, isLoading: _loading),
+                            PrimaryButton(label: 'Send Reset Link', onPressed: _requestReset, isLoading: _loading),
                           ] else ...[
-                            // Show success message + button to go to reset screen
+                            // Show success message only
                             Container(
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
@@ -134,7 +129,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                                   SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
-                                      'Code sent! Check your email inbox.',
+                                      'Reset link sent! Check your email and click the link.',
                                       style: TextStyle(color: AppColors.success, fontSize: 13),
                                     ),
                                   ),
@@ -142,11 +137,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                               ),
                             ),
                             const SizedBox(height: 16),
-                            PrimaryButton(label: 'Enter Code & Reset Password', onPressed: _goToReset),
-                            const SizedBox(height: 12),
                             TextButton(
-                              onPressed: () => setState(() { _emailSent = false; _error = null; }),
-                              child: Text('Resend Code', style: TextStyle(color: isDark ? AppColors.primary : AppColors.primary)),
+                              onPressed: _requestReset,
+                              child: Text('Resend Link', style: TextStyle(color: isDark ? AppColors.primary : AppColors.primary)),
                             ),
                           ],
                         ],

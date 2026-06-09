@@ -1,15 +1,31 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
-    // Add the Google services Gradle plugin
+
+    // Google Services
     id("com.google.gms.google-services")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
+
+    // Flutter plugin
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+// Load keystore properties
+val keystoreProperties = Properties()
+val keystorePropertiesFile = rootProject.file("key.properties")
+
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+}
+
 android {
+
     namespace = "com.notesnet.app"
+
     compileSdk = 36
+
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -19,38 +35,80 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
+        jvmTarget = "17"
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+
         applicationId = "com.notesnet.app"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion // Flutter default or your preference, usually 21 for modern apps
+
+        minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
+
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
         multiDexEnabled = true
     }
 
+    signingConfigs {
+
+        create("release") {
+
+            keyAlias = keystoreProperties["keyAlias"] as String
+
+            keyPassword = keystoreProperties["keyPassword"] as String
+
+            storeFile = file(
+                keystoreProperties["storeFile"] as String
+            )
+
+            storePassword = keystoreProperties["storePassword"] as String
+        }
+    }
+
     buildTypes {
+
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
+
+            signingConfig = signingConfigs.getByName("release")
+
+            isMinifyEnabled = true
+            isShrinkResources = true
+
+            proguardFiles(
+                getDefaultProguardFile(
+                    "proguard-android-optimize.txt"
+                ),
+                "proguard-rules.pro"
+            )
+        }
+
+        debug {
+
             signingConfig = signingConfigs.getByName("debug")
         }
     }
 }
 
 dependencies {
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
-    
-    // Import the Firebase BoM
-    implementation(platform("com.google.firebase:firebase-bom:34.12.0"))
 
-    // Add the dependencies for Firebase products you want to use
-    implementation("com.google.firebase:firebase-analytics")
+    // Java 17 desugaring
+    coreLibraryDesugaring(
+        "com.android.tools:desugar_jdk_libs:2.1.4"
+    )
+
+    // Firebase BOM
+    implementation(
+        platform(
+            "com.google.firebase:firebase-bom:34.12.0"
+        )
+    )
+
+    // Firebase Analytics
+    implementation(
+        "com.google.firebase:firebase-analytics"
+    )
 }
 
 flutter {

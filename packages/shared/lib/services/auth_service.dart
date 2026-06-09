@@ -110,22 +110,11 @@ class AuthService {
   Future<void> resetPassword(String email) async {
     await _client.auth.resetPasswordForEmail(
       email,
-      redirectTo: 'io.notesnet.app://login-callback',
+      redirectTo: 'notesnet://reset-password',
     );
   }
 
-  Future<void> verifyOTPAndResetPassword({
-    required String email,
-    required String token,
-    required String newPassword,
-  }) async {
-    // Verify OTP first
-    await _client.auth.verifyOTP(
-      email: email,
-      token: token,
-      type: OtpType.recovery,
-    );
-    // Then update the password
+  Future<void> updatePassword(String newPassword) async {
     await _client.auth.updateUser(
       UserAttributes(password: newPassword),
     );

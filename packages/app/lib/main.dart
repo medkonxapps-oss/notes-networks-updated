@@ -46,6 +46,7 @@ void main() async {
           authFlowType: AuthFlowType.pkce,
         ),
       );
+      debugPrint('✅ Supabase initialized successfully');
     } catch (e) {
       debugPrint('⚠️ Supabase initialization failed: $e');
     }

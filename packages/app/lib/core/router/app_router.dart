@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:shared/shared.dart';
 import 'package:app/shared/providers/providers.dart';
 import 'package:app/features/auth/screens/forgot_password_screen.dart';
@@ -57,8 +58,24 @@ class GoRouterRefreshStream extends ChangeNotifier {
   void dispose() { _subscription.cancel(); super.dispose(); }
 }
 
+// Global flag to prevent redirect during password recovery
+bool _isPasswordRecoveryFlow = false;
+
 final routerProvider = Provider<GoRouter>((ref) {
   final supabase = ref.watch(supabaseClientProvider);
+  
+  // Listen for password recovery events to set flag
+  supabase.auth.onAuthStateChange.listen((event) {
+    if (event.event == AuthChangeEvent.passwordRecovery) {
+      _isPasswordRecoveryFlow = true;
+      debugPrint('🔐 Router: Password recovery detected, disabling auto-redirect');
+      // Clear flag after 5 seconds as safety
+      Future.delayed(const Duration(seconds: 5), () {
+        _isPasswordRecoveryFlow = false;
+      });
+    }
+  });
+  
   return GoRouter(
     initialLocation: '/',
     refreshListenable: GoRouterRefreshStream(supabase.auth.onAuthStateChange),
@@ -67,10 +84,19 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isLoggedIn = user != null;
       final isSplash = state.matchedLocation == '/';
       final isAuthRoute = state.matchedLocation.startsWith('/auth');
+      final isResetPassword = state.matchedLocation.startsWith('/auth/reset-password');
       
       if (isSplash) return null;
       if (!isLoggedIn && !isAuthRoute) return '/auth/login';
-      if (isLoggedIn && isAuthRoute) return '/home';
+      
+      // If password recovery flow is active, allow reset password screen
+      if (_isPasswordRecoveryFlow && isResetPassword) {
+        debugPrint('🚀 Router: Allowing reset-password for recovery flow');
+        return null;
+      }
+      
+      // Allow reset password screen even when logged in (for password recovery flow)
+      if (isLoggedIn && isAuthRoute && !isResetPassword) return '/home';
       return null;
     },
     routes: [

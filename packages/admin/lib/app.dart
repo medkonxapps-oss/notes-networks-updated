@@ -74,7 +74,6 @@ class _AdminAppState extends ConsumerState<AdminApp> {
       title: 'NotesNet Admin',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
         scaffoldBackgroundColor: AppColors.background,
         appBarTheme: const AppBarTheme(

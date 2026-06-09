@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'shared/providers/providers.dart';
@@ -35,12 +36,29 @@ class _NotesNetAppState extends ConsumerState<NotesNetApp> {
     ref.watch(noteStatsSyncProvider);
 
     // Listen for login to trigger notification permission
-    ref.listen(authStateProvider, (previous, next) {
+    ref.listen(authStateProvider, (previous, next) async {
+      final authData = next.value;
+      final nextSession = authData?.session;
       final prevSession = previous?.value?.session;
-      final nextSession = next.value?.session;
 
-      // User just logged in → init notifications
-      if (nextSession != null && prevSession == null) {
+      // Handle Password Recovery link click - redirect to reset password screen
+      if (authData?.event == AuthChangeEvent.passwordRecovery) {
+        debugPrint('🔐 Password Recovery Event Detected!');
+        final email = nextSession?.user.email ?? '';
+        debugPrint('📧 Email: $email');
+        
+        // Add small delay to ensure router is ready
+        await Future.delayed(const Duration(milliseconds: 500));
+        
+        if (context.mounted) {
+          debugPrint('🚀 Navigating to reset password screen...');
+          router.go('/auth/reset-password?email=${Uri.encodeComponent(email)}');
+        }
+        return;
+      }
+
+      // User just logged in → init notifications (but NOT during password recovery)
+      if (nextSession != null && prevSession == null && authData?.event != AuthChangeEvent.passwordRecovery) {
         ref.read(pushNotificationProvider.notifier).init();
       }
 

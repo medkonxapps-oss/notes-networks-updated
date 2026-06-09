@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { processUploadQueue } from '../jobs/queue';
+import { processUploadQueue, notifyFollowersQueue } from '../jobs/queue';
 import { supabase } from '../config/supabase';
 import { MailService } from '../services/mailService';
 
@@ -79,8 +79,13 @@ router.post('/teacher-status-updated', verifyWebhookSecret, async (req: Request,
 
     // 1. Send Push Notification (if they have a token)
     if (user.fcm_token) {
-      // Logic for push notification would go here
-      console.log(`📱 Push notification logged for ${user.email}`);
+      await notifyFollowersQueue.add('send-push', {
+        type: 'system',
+        title,
+        body,
+        targetUserId: user.id,
+      });
+      console.log(`📱 Push notification queued for ${user.email}`);
     }
 
     // 2. Send Email using SendGrid
@@ -114,7 +119,7 @@ router.post('/chat-message', verifyWebhookSecret, async (req: Request, res: Resp
 
     // Send Push Notification via BullMQ
     if (receiver?.fcm_token) {
-      await processUploadQueue.add('send-push', {
+      await notifyFollowersQueue.add('send-push', {
         type: 'chat',
         title: `New message from ${sender?.full_name || 'Teacher'}`,
         body: message.content.length > 100 ? message.content.slice(0, 97) + '...' : message.content,
@@ -187,7 +192,7 @@ router.post('/system-notification', verifyWebhookSecret, async (req: Request, re
     }
 
     // Queue push notification
-    await processUploadQueue.add('send-push', {
+    await notifyFollowersQueue.add('send-push', {
       type: notification.type,
       title: notification.title,
       body: notification.message,
