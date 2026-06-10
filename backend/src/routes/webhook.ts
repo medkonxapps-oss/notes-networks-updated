@@ -178,7 +178,7 @@ router.post('/reprocess-note', verifyWebhookSecret, async (req: Request, res: Re
 });
 
 // POST /webhook/system-notification
-// Called by Supabase Edge Function relay when a new system notification is created
+// Called by Supabase Edge Function relay when a new notification row is created
 router.post('/system-notification', verifyWebhookSecret, async (req: Request, res: Response) => {
   try {
     const notification = req.body;
@@ -186,8 +186,8 @@ router.post('/system-notification', verifyWebhookSecret, async (req: Request, re
       return res.status(400).json({ error: 'Invalid payload' });
     }
 
-    // Only process system and forum notifications for push
-    if (!['system', 'forum', 'reward'].includes(notification.type)) {
+    // Only process in-app notification types that should also reach the device
+    if (!['like', 'save', 'follow', 'forum', 'reward', 'streak', 'system', 'download', 'comment'].includes(notification.type)) {
        return res.json({ success: true, skipped: true });
     }
 
@@ -198,6 +198,7 @@ router.post('/system-notification', verifyWebhookSecret, async (req: Request, re
       body: notification.message,
       targetUserId: notification.user_id,
       noteId: notification.reference_id || null,
+      notificationId: notification.id || null,
     });
 
     console.log(`📱 Queued push notification for user: ${notification.user_id}`);

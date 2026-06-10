@@ -82,6 +82,24 @@ serve(async (req: Request) => {
       }
     }
 
+    // Process new notification rows for push delivery
+    if (payload.type === 'INSERT' && payload.table === 'notifications') {
+      const vpsUrl = Deno.env.get('VPS_URL');
+      const webhookSecret = Deno.env.get('WEBHOOK_SECRET');
+
+      if (vpsUrl && webhookSecret) {
+        const response = await fetch(`${vpsUrl}/webhook/system-notification`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-webhook-secret': webhookSecret,
+          },
+          body: JSON.stringify(payload.record),
+        });
+        return new Response(JSON.stringify({ forwarded: response.ok }), { status: 200 });
+      }
+    }
+
     return new Response(JSON.stringify({ message: 'ignored' }), { status: 200 });
   } catch (error) {
     return new Response(JSON.stringify({ error: error.message }), { status: 500 });

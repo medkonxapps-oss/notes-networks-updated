@@ -101,6 +101,7 @@ class _NotifCard extends ConsumerWidget {
           switch (notif.type) {
             case 'like': 
             case 'save':
+            case 'comment':
             case 'system': context.push('/notes/${notif.referenceId}'); break;
             case 'forum': context.push('/forums/${notif.referenceId}'); break;
             case 'follow': context.push('/profile/${notif.referenceId}'); break;
@@ -140,6 +141,7 @@ class _NotifCard extends ConsumerWidget {
     switch (type) {
       case 'like': return Icons.favorite_rounded;
       case 'save': return Icons.bookmark_rounded;
+      case 'comment': return Icons.chat_bubble_rounded;
       case 'download': return Icons.file_download_rounded;
       case 'follow': return Icons.person_add_rounded;
       case 'reward': return Icons.card_giftcard_rounded;
